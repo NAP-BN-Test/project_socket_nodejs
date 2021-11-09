@@ -153,4 +153,25 @@ module.exports = {
                 res.redirect('/good');
             }
     },
+    dataScraping: async (req, res) => {
+        const request = require('request');
+        const cheerio = require('cheerio');
+        for (let i = 0; i < 1000; i++) {
+            await request('https://www.anphatpc.com.vn/laptop-acer-nitro-5-an515-56-79u2-nh.qbzsv.001-core-i7-11370h-8gb-512gb-gtx-1650-4gb-15.6-inch-fhd-win-10-den_id37137.html', async function (error, response, body) {
+                console.error('error:', error); // Print the error if one occurred
+                const $ = cheerio.load(body);
+                let ds = $(body).find("b.js-pro-total-price")
+                ds.each(function (i, e) {
+                    console.log($(this).text().trim());
+                })
+                // console.log(ds);
+            });
+        }
+        var result = {
+            // body: body,
+            // response: response,
+            message: 'test'
+        }
+        res.json(result);
+    }
 }

@@ -29,6 +29,9 @@ server.listen(port, function () {
 });
 let routes = require('./api/router') //importing route
 
+
+const uploadFileDrive = require('./api/controllers/upload-drive')
+uploadFileDrive.createFileInFolder()
 // Initializes passport and passport sessions
 const passport = require('passport')
 app.use(passport.initialize());
