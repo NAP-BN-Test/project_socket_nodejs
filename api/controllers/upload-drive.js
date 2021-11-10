@@ -40,9 +40,9 @@ const drive = google.drive({
     auth: oauth2Client
 })
 
-const filePath = 'D:/images_services/ageless_sendmail/testuploadfile.jpg'
+// const filePath = 'D:/images_services/ageless_sendmail/testuploadfile.jpg'
 
-async function uploadFile() {
+async function uploadFile(filePath) {
     try {
         const response = await drive.files.create({
             requestBody: {
@@ -62,10 +62,11 @@ async function uploadFile() {
 }
 
 // Xóa file upload
-async function deleteFile() {
+// '1GENCXI-_1ne5t3ym2Bb5gN2QK7JgximT'
+async function deleteFile(idFile) {
     try {
         const response = await drive.files.delete({
-            fileId: '1GENCXI-_1ne5t3ym2Bb5gN2QK7JgximT'
+            fileId: idFile
         })
         console.log(response.data, response.status);
     } catch (error) {
@@ -73,10 +74,9 @@ async function deleteFile() {
     }
 }
 // Tạo ra link tải và link xem
-
-async function generatePublicUrl() {
+// const fileId = '16s8kQD0YE5GVpm7cpmmhYe7HqjS9sRDG'
+async function generatePublicUrl(fileId) {
     try {
-        const fileId = '16s8kQD0YE5GVpm7cpmmhYe7HqjS9sRDG'
         await drive.permissions.create({
             fileId: fileId,
             requestBody: {
@@ -94,10 +94,10 @@ async function generatePublicUrl() {
         console.log(error);
     }
 }
-
-async function createFolder() {
+// 
+async function createFolder(nameFolder) {
     var fileMetadata = {
-        'name': 'Invoices',
+        'name': nameFolder,
         'mimeType': 'application/vnd.google-apps.folder'
     };
     drive.files.create({
@@ -112,9 +112,8 @@ async function createFolder() {
         }
     });
 }
-
-async function createFileInFolder() {
-    var folderId = '1ujGCxy6vTptr4xGfddGmgflAFHTYfPRb';
+// var folderId = '1ujGCxy6vTptr4xGfddGmgflAFHTYfPRb';
+async function createFileInFolder(folderId) {
     var fileMetadata = {
         'name': 'photo.jpg',
         parents: [folderId]
