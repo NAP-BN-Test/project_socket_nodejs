@@ -19,7 +19,7 @@ var REDIRECT_URI = "https://developers.google.com/oauthplayground";
 var SCOPE = "https://www.googleapis.com/auth/drive";
 
 const REFRESH_TOKEN = "1//04qx2OYiYohMfCgYIARAAGAQSNwF-L9Ir5D80tzNl_DLoIma02Qv7oWMu17fOH5_QjVAoUBRlEWVSQY1WEtS_e7DQQTHHkz-5bR8"
-    // the url to which the user is redirected to
+// the url to which the user is redirected to
 
 var url = "";
 
@@ -103,7 +103,7 @@ async function createFolder(nameFolder) {
     drive.files.create({
         resource: fileMetadata,
         fields: 'id'
-    }, function(err, file) {
+    }, function (err, file) {
         if (err) {
             // Handle error
             console.error(err);
@@ -126,7 +126,7 @@ async function createFileInFolder(folderId) {
         resource: fileMetadata,
         media: media,
         fields: 'id'
-    }, function(err, file) {
+    }, function (err, file) {
         if (err) {
             // Handle error
             console.error(err);
@@ -136,7 +136,7 @@ async function createFileInFolder(folderId) {
     });
 }
 module.exports = {
-    uploadFile: async(res, req) => {
+    uploadFile: async (res, req) => {
         const body = res.body
         console.log(res);
         console.log(body);
@@ -157,7 +157,7 @@ module.exports = {
             console.log(error);
         }
     },
-    deleteFile: async(res, req) => {
+    deleteFile: async (res, req) => {
         const body = res.body
         try {
             const response = await drive.files.delete({
@@ -170,49 +170,64 @@ module.exports = {
         }
     },
     generatePublicUrl,
-    createFolder: async(res, req) => {
+    createFolder: async (res, req) => {
         const body = res.body
-            // console.log(res);
-        console.log(body);
         var fileMetadata = {
             'name': body.phone + '-' + body.name,
             'mimeType': 'application/vnd.google-apps.folder'
         };
-        console.log(fs.createReadStream('D:/anhdamcuoi/IMG_0086.jpg'));
-        var media = {
-            mimeType: 'image/jpeg',
-            body: fs.createReadStream('D:/anhdamcuoi/IMG_0086.jpg')
-        };
-        // drive.files.create({
-        //     resource: fileMetadata,
-        //     fields: 'id'
-        // }, function(err, file) {
-        //     if (err) {
-        //         // Handle error
-        //         console.error(err);
-        //     } else {
-        //         var fileUpload = {
-        //             'name': 'photo.jpg',
-        //             parents: [file.data.id]
-        //         };
-        //         drive.files.create({
-        //             resource: fileUpload,
-        //             media: media,
-        //             fields: 'id'
-        //         }, function(err, file) {
-        //             if (err) {
-        //                 // Handle error
-        //                 console.error(err);
-        //             } else {
-        //                 console.log('File Id: ', file.data);
-        //             }
-        //         });
-        //         console.log('Folder Id: ', file.data.id);
-        //         req.json(1)
-        //     }
-        // });
+        drive.files.create({
+            resource: fileMetadata,
+            fields: 'id'
+        }, function (err, file) {
+            if (err) {
+                // Handle error
+                console.error(err);
+            } else {
+                let count = 1;
+                for (let imgData of body.image) {
+                    new Promise((resolve, reject) => {
+                        var base64Data = imgData.replace('data:image/jpeg;base64,', "");
+                        base64Data = base64Data.replace(/ /g, '+');
+                        var buf = new Buffer.from(base64Data, "base64");
+                        let randomNameFile = Math.floor(Math.random() * 1000000000)
+                        let path = 'D:/images_services/ageless_sendmail/' + randomNameFile + '.jpg'
+                        fs.writeFile(path, buf, function (err) {
+                            if (err) reject(err);
+                            else {
+                                var media = {
+                                    mimeType: 'image/jpeg',
+                                    body: fs.createReadStream(path)
+                                };
+                                var fileUpload = {
+                                    'name': 'photo-' + randomNameFile + '.jpg',
+                                    parents: [file.data.id]
+                                };
+                                drive.files.create({
+                                    resource: fileUpload,
+                                    media: media,
+                                    fields: 'id'
+                                }, function (err, file) {
+                                    if (err) {
+                                        // Handle error
+                                        console.error(err);
+                                    } else {
+                                        console.log('File Id: ', file.data);
+                                    }
+                                });
+                                console.log('Folder Id: ', file.data.id);
+                                resolve(1)
+                            }
+                        });
+                        count += 1
+                    });
+
+                }
+            }
+        });
+        req.json(1)
     },
-    createFileInFolder: async(res, req) => {
+    createFileInFolder: async (res, req) => {
         const body = res.body
         var fileMetadata = {
             'name': 'photo.jpg',
@@ -220,13 +235,13 @@ module.exports = {
         };
         var media = {
             mimeType: 'image/jpeg',
-            body: fs.createReadStream('D:/anhdamcuoi/IMG_0086.jpg')
+            body: fs.createReadStream('D:/images_services/ageless_sendmail/1615997063.jpg')
         };
         drive.files.create({
             resource: fileMetadata,
             media: media,
             fields: 'id'
-        }, function(err, file) {
+        }, function (err, file) {
             if (err) {
                 // Handle error
                 console.error(err);

@@ -18,7 +18,7 @@
             <input id="input" type="file" multiple>
             <div id="result"></div>
             <!-- <input type="file" id="input" multiple /> -->
-            <input type="submit" onclick="javascript:readFile()" value="Submit" />
+            <input type="submit" onclick="javascript:callapi()" value="Submit" />
         </form>
     </div>
     <script type="text/javascript" language="javascript">
@@ -26,49 +26,28 @@
             debugger;
 
         }
-        document.getElementById('input').addEventListener('change', function() {
-            // debugger;
-
-            var reader = new FileReader();
-            reader.onload = function() {
-
-                var arrayBuffer = this.result,
-                    array = new Uint8Array(arrayBuffer),
-                    binaryString = String.fromCharCode.apply(null, array);
-
-                console.log(binaryString);
-
-            }
-            reader.readAsArrayBuffer(this.files[0]);
-
-        }, false);
-        // const EL_browse = document.getElementById('browse');
-        // const EL_preview = document.getElementById('preview');
-
-        // const readImage = file => {
-        //     if (!(/^image\/(png|jpe?g|gif)$/).test(file.type))
-        //         return EL_preview.insertAdjacentHTML('beforeend', `Unsupported format ${file.type}: ${file.name}<br>`);
-
-        //     const img = new Image();
-        //     img.addEventListener('load', (e) => {
-        //         console.log(e, file, img);
-        //         EL_preview.appendChild(img);
-        //         EL_preview.insertAdjacentHTML('beforeend', `<div>${file.name} ${img.width}×${img.height} ${file.type} ${Math.round(file.size/1024)}KB<div>`);
-        //         window.URL.revokeObjectURL(img.src); // Free some memory
-        //     });
-        //     console.log(window.URL.createObjectURL(file), 12344);
-        //     img.src = window.URL.createObjectURL(file);
+        // async function toBase64(file) {
+        //     const reader = new FileReader();
+        //     await reader.readAsDataURL(file);
+        //     reader.onload = await function () {
+        //         console.log(reader.result);
+        //         return reader.result
+        //     }
+        //     reader.onerror = error => {
+        //         console.log(error);
+        //         return error
+        //     };
         // }
+        // Dùng kiểu này không cần async, await
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+        document.getElementById('input').addEventListener('change', callapi, false);
 
-        // EL_browse.addEventListener('change', ev => {
-        // EL_preview.innerHTML = ''; // Remove old images and data
-        // const files = ev.target.files;
-        // if (!files || !files[0]) return alert('File upload not supported');
-        // [...files].forEach(readImage);
-        // });
-        // document.getElementById("input").v("change", readFile);
-
-        function callapi() {
+        async function callapi() {
             debugger;
             const url = "http://localhost:3300/create_folder";
             hoten = document.getElementById("hvt").value;
@@ -80,16 +59,12 @@
             var file = {};
 
             for (var i = 0; i < files.length; i++) {
-                file = {
-                    lastMod: files[i].lastModified,
-                    lastModDate: files[i].lastModifiedDate,
-                    name: files[i].name,
-                    size: files[i].size,
-                    type: files[i].type,
-                };
-                console.log(files[i]);
+                console.log(files[i], i);
+                const file = files[i];
+                let base64 = await toBase64(file)
+                console.log(base64);
                 //add the file obj to your array
-                myArray.push(file);
+                myArray.push(base64);
             }
 
             const parram = {
