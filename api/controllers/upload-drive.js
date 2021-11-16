@@ -18,8 +18,8 @@ var REDIRECT_URI = "https://developers.google.com/oauthplayground";
 
 var SCOPE = "https://www.googleapis.com/auth/drive";
 
-const REFRESH_TOKEN = "1//045CwxbVJ0k1OCgYIARAAGAQSNwF-L9Irdrhod_eVGmbknShj5IEPnx3pu42aay85zplDbKLgAMMSU8gufzJsp1FCbLBkFHXIrW8"
-// the url to which the user is redirected to
+const REFRESH_TOKEN = "1//04qx2OYiYohMfCgYIARAAGAQSNwF-L9Ir5D80tzNl_DLoIma02Qv7oWMu17fOH5_QjVAoUBRlEWVSQY1WEtS_e7DQQTHHkz-5bR8"
+    // the url to which the user is redirected to
 
 var url = "";
 
@@ -103,7 +103,7 @@ async function createFolder(nameFolder) {
     drive.files.create({
         resource: fileMetadata,
         fields: 'id'
-    }, function (err, file) {
+    }, function(err, file) {
         if (err) {
             // Handle error
             console.error(err);
@@ -126,7 +126,7 @@ async function createFileInFolder(folderId) {
         resource: fileMetadata,
         media: media,
         fields: 'id'
-    }, function (err, file) {
+    }, function(err, file) {
         if (err) {
             // Handle error
             console.error(err);
@@ -136,9 +136,103 @@ async function createFileInFolder(folderId) {
     });
 }
 module.exports = {
-    uploadFile,
-    deleteFile,
+    uploadFile: async(res, req) => {
+        const body = res.body
+        console.log(res);
+        console.log(body);
+        try {
+            const response = await drive.files.create({
+                requestBody: {
+                    name: 'test.jpg',
+                    mimeType: 'image/jpg'
+                },
+                media: {
+                    mimeType: 'image/jpg',
+                    body: fs.createReadStream(body.filePath)
+                }
+            })
+            req.json(1)
+            console.log(response.data);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    deleteFile: async(res, req) => {
+        const body = res.body
+        try {
+            const response = await drive.files.delete({
+                fileId: body.idFile
+            })
+            console.log(response.data, response.status);
+            req.json(1)
+        } catch (error) {
+            console.log(error);
+        }
+    },
     generatePublicUrl,
-    createFolder,
-    createFileInFolder,
+    createFolder: async(res, req) => {
+        const body = res.body
+            // console.log(res);
+        console.log(body);
+        var fileMetadata = {
+            'name': body.phone + '-' + body.name,
+            'mimeType': 'application/vnd.google-apps.folder'
+        };
+        console.log(fs.createReadStream('D:/anhdamcuoi/IMG_0086.jpg'));
+        var media = {
+            mimeType: 'image/jpeg',
+            body: fs.createReadStream('D:/anhdamcuoi/IMG_0086.jpg')
+        };
+        // drive.files.create({
+        //     resource: fileMetadata,
+        //     fields: 'id'
+        // }, function(err, file) {
+        //     if (err) {
+        //         // Handle error
+        //         console.error(err);
+        //     } else {
+        //         var fileUpload = {
+        //             'name': 'photo.jpg',
+        //             parents: [file.data.id]
+        //         };
+        //         drive.files.create({
+        //             resource: fileUpload,
+        //             media: media,
+        //             fields: 'id'
+        //         }, function(err, file) {
+        //             if (err) {
+        //                 // Handle error
+        //                 console.error(err);
+        //             } else {
+        //                 console.log('File Id: ', file.data);
+        //             }
+        //         });
+        //         console.log('Folder Id: ', file.data.id);
+        //         req.json(1)
+        //     }
+        // });
+    },
+    createFileInFolder: async(res, req) => {
+        const body = res.body
+        var fileMetadata = {
+            'name': 'photo.jpg',
+            parents: [body.folderId]
+        };
+        var media = {
+            mimeType: 'image/jpeg',
+            body: fs.createReadStream('D:/anhdamcuoi/IMG_0086.jpg')
+        };
+        drive.files.create({
+            resource: fileMetadata,
+            media: media,
+            fields: 'id'
+        }, function(err, file) {
+            if (err) {
+                // Handle error
+                console.error(err);
+            } else {
+                console.log('File Id: ', file.data);
+            }
+        });
+    },
 }

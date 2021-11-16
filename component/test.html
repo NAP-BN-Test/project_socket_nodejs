@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    <div>
+        <form action="">
+            <label for="fname">Số điện thoại:</label>
+            <input type="text" id="sdt" name="sdt" /><br /><br />
+            <label for="lname">Họ và tên:</label>
+            <input type="text" id="hvt" name="hvt" /><br /><br />
+            <input id="input" type="file" multiple>
+            <div id="result"></div>
+            <!-- <input type="file" id="input" multiple /> -->
+            <input type="submit" onclick="javascript:readFile()" value="Submit" />
+        </form>
+    </div>
+    <script type="text/javascript" language="javascript">
+        function readFile() {
+            debugger;
+
+        }
+        document.getElementById('input').addEventListener('change', function() {
+            // debugger;
+
+            var reader = new FileReader();
+            reader.onload = function() {
+
+                var arrayBuffer = this.result,
+                    array = new Uint8Array(arrayBuffer),
+                    binaryString = String.fromCharCode.apply(null, array);
+
+                console.log(binaryString);
+
+            }
+            reader.readAsArrayBuffer(this.files[0]);
+
+        }, false);
+        // const EL_browse = document.getElementById('browse');
+        // const EL_preview = document.getElementById('preview');
+
+        // const readImage = file => {
+        //     if (!(/^image\/(png|jpe?g|gif)$/).test(file.type))
+        //         return EL_preview.insertAdjacentHTML('beforeend', `Unsupported format ${file.type}: ${file.name}<br>`);
+
+        //     const img = new Image();
+        //     img.addEventListener('load', (e) => {
+        //         console.log(e, file, img);
+        //         EL_preview.appendChild(img);
+        //         EL_preview.insertAdjacentHTML('beforeend', `<div>${file.name} ${img.width}×${img.height} ${file.type} ${Math.round(file.size/1024)}KB<div>`);
+        //         window.URL.revokeObjectURL(img.src); // Free some memory
+        //     });
+        //     console.log(window.URL.createObjectURL(file), 12344);
+        //     img.src = window.URL.createObjectURL(file);
+        // }
+
+        // EL_browse.addEventListener('change', ev => {
+        // EL_preview.innerHTML = ''; // Remove old images and data
+        // const files = ev.target.files;
+        // if (!files || !files[0]) return alert('File upload not supported');
+        // [...files].forEach(readImage);
+        // });
+        // document.getElementById("input").v("change", readFile);
+
+        function callapi() {
+            debugger;
+            const url = "http://localhost:3300/create_folder";
+            hoten = document.getElementById("hvt").value;
+            sdt = document.getElementById("sdt").value;
+            image = document.querySelector('input[type="file"]');
+
+            var files = document.getElementById("input").files;
+            var myArray = [];
+            var file = {};
+
+            for (var i = 0; i < files.length; i++) {
+                file = {
+                    lastMod: files[i].lastModified,
+                    lastModDate: files[i].lastModifiedDate,
+                    name: files[i].name,
+                    size: files[i].size,
+                    type: files[i].type,
+                };
+                console.log(files[i]);
+                //add the file obj to your array
+                myArray.push(file);
+            }
+
+            const parram = {
+                name: hoten,
+                phone: sdt,
+                image: myArray,
+            };
+
+            console.log("parram ", parram);
+            const opstion = {
+                method: "POST",
+                body: JSON.stringify(parram),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            };
+
+            fetch(url, opstion)
+                .then((res) => res.json())
+                .then((res) => {
+                    console.log("end");
+                });
+
+            const request = (url, parram, method = "POST") => {
+                let options = {
+                    method,
+                };
+                if ("POST" === method) {
+                    url += "?" + new URLSearchParams(parram).toString();
+                } else {
+                    options.body = JSON.stringify(parram);
+                }
+
+                return fetch(url, options).then((response) => response.json());
+            };
+
+            const get = (url, parram) => request(url, parram, "GET");
+            const post = (url, parram) => request(url, parram, "POST");
+        }
+    </script>
+</body>
+
+</html>
