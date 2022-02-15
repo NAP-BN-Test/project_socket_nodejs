@@ -34,3 +34,16 @@ const passport = require('passport')
 app.use(passport.initialize());
 app.use(passport.session());
 routes(app)
+
+
+var socket = require('./api/socket_io/socket');
+socket.sockketIO(io)
+app.post('/notification-chiphi', async function (req, res) {
+    let body = req.body;
+    await socket.socketEmitNotifiCost(io, body.dbname)
+    var result = {
+        status: 1,
+        message: '',
+    }
+    res.json(result);
+})
