@@ -35,7 +35,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 routes(app)
 
-
+var io = require("socket.io")(server, {
+    cors: {
+        wsEngine: 'eiows',
+        origin: ["http://dbdev.namanphu.vn:8692", "http://localhost:4210", "http://dbdev.namanphu.vn:8693", "http://dbdev.namanphu.vn:8694"],
+        methods: ["GET", "POST"],
+        credentials: true,
+    }
+})
 var socket = require('./api/socket_io/socket');
 socket.sockketIO(io)
 app.post('/notification-chiphi', async function (req, res) {
